@@ -1,0 +1,232 @@
+{% include 'admin/menu.html' %}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+
+            <div class="card">
+                <div class="card-header">Datos del producto</div>
+                <div class="card-body">
+
+                    <form action="/admin/productos/guardar" method="post" enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label for="txtNombre" class="form-label">Nombre del producto</label>
+                            <input type="text" class="form-control" name="txtNombre" id="txtNombre"
+                                aria-describedby="helpId" placeholder="Escriba el nombre del producto" />
+
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label for="txtDescripcion" class="form-label">Descripción:</label>
+                            <input type="text" class="form-control" name="txtDescripcion" id="txtDescripcion"
+                                aria-describedby="helpId" placeholder="Introduzca la descripción del producto" />
+
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label for="txtPrecio" class="form-label">Precio:</label>
+                            <input type="number" min="0" step="0.01" class="form-control" name="txtPrecio"
+                                id="txtImagen" aria-describedby="helpId" placeholder="Establezca un precio" />
+
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label for="txtStock" class="form-label">Stock:</label>
+                            <input type="number" class="form-control" name="txtStock" id="txtStock"
+                                aria-describedby="helpId" placeholder="Cantidad del producto disponible" />
+
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label for="txtCategoria" class="form-label">Categoría:</label>
+                            <input type="text" class="form-control" name="txtCategoria" id="txtCategoria"
+                                aria-describedby="helpId" placeholder="Introduzca la descripción del producto" />
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imgImage" class="form-label">Imagen:</label>
+                            <input type="file" class="form-control" name="imgImage" id="imgImage"
+                                aria-describedby="helpId" placeholder="Seleccione la imagen" />
+
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Agregar
+                        </button>
+
+                        <a href="{{ url_for('categoria_guardar') }}" class="btn btn-primary">
+                            Agregar categoría
+                         </a>
+                         
+                        
+
+                        
+
+
+                        
+
+
+
+                    </form>
+
+
+                </div>
+                <div class="card-footer text-muted"></div>
+            </div>
+
+        </div>
+        <div class="col-md-7">
+
+            <div class="table-responsive">
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Categoría</th>
+                            <th scope="col">Imagen</th>
+                            <th scope="col">Fecha_creacion</th>
+                            <th scope="col">Fecha_actualizacion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for producto in producto%}
+                        <tr>
+                            <td>{{ producto['id'] }}</td>
+                            <td>{{ producto['nombre'] }}</td>
+                            <td>{{ producto['descripcion'] }}</td>
+                            <td>{{ producto['precio'] }}</td>
+                            <td>{{ producto['stock'] }}</td>
+                            <td>{{ producto['categoria_id'] }}</td>
+                            <td>
+
+                                <img width="60" src="{{ url_for('static', filename='img/' + producto['imagen_url']) }}"
+                                    class="img-fluid rounded-top" alt="" />
+
+
+                                <!-- {{ producto['imagen_url'] }} -->
+                            </td>
+                            <td>{{ producto['fecha_creacion'] }}</td>
+                            <td>{{ producto['fecha_actualizacion'] }}</td>
+
+
+                            <td>
+                                <form action="/admin/Productos/borrar" method="POST" style="display: inline;">
+                                    <button value="{{ producto['id'] }}" type="submit" class="btn btn-danger"
+                                        name="txtID" id="txtID">
+                                        Eliminar
+                                    </button>
+                                </form>
+
+
+                            </td>
+
+                            <td>
+                                <form action="/admin/Productos/editar" method="POST" style="display: inline;">
+                                    <button value="{{ producto['id'] }}" type="submit" class="btn btn-danger"
+                                        name="txtID" id="txtID">
+                                        Editar
+                                    </button>
+                                </form>
+
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <div class="col-md-7">
+
+                <div class="table-responsive">
+                    <table class="table table-primary">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Fecha_creacion</th>
+                                
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% for categoria in categoria %}
+                            <tr>
+                                <td>{{ categoria['id'] }}</td>
+                                <td>{{ categoria['nombre'] }}</td>
+                                <td>{{ categoria['descripcion'] }}</td>
+                                <td>{{ categoria['fecha_creacion'] }}</td>
+
+
+                                <td>
+                                    <form action="/admin/categoria/borrar" method="POST" style="display: inline;">
+                                        <button value="{{ categoria['id'] }}" type="submit" class="btn btn-danger"
+                                            name="txtID" id="txtID">
+                                            Eliminar
+                                        </button>
+                                    </form>
+
+
+                                </td>
+
+                                <td>
+                                    <form action="/admin/categoria/editar" method="POST" style="display: inline;">
+                                        <button value="{{ categoria['id'] }}" type="submit" class="btn btn-danger"
+                                            name="txtID" id="txtID">
+                                            Editar
+                                        </button>
+                                    </form>
+
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+{% include 'admin/pie_pagina.html' %}

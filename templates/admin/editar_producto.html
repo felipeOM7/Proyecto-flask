@@ -1,0 +1,42 @@
+
+{% include 'admin/menu.html' %}
+
+<form action="/admin/Productos/actualizar" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{{ producto['id'] }}">
+
+    <div class="mb-3">
+        <label for="txtNombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" name="txtNombre" value="{{ producto['nombre'] }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtDescripcion" class="form-label">Descripción</label>
+        <input type="text" class="form-control" name="txtDescripcion" value="{{ producto['descripcion'] }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtPrecio" class="form-label">Precio</label>
+        <input type="number" class="form-control" name="txtPrecio" value="{{ producto['precio'] }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtStock" class="form-label">Stock</label>
+        <input type="number" class="form-control" name="txtStock" value="{{ producto['stock'] }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtCategoria" class="form-label">Categoría</label>
+        <input type="text" class="form-control" name="txtCategoria" value="{{ producto['categoria_id'] }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="imgImage" class="form-label">Imagen</label>
+        <input type="file" class="form-control" name="imgImage">
+        <img src="{{ url_for('static', filename='img/' + producto['imagen_url']) }}" width="100">
+    </div>
+
+    <form action="/admin/Productos/actualizar" method="POST" style="display: inline;">
+        <button value="{{ producto['id'] }}" type="submit" class="btn btn-danger" name="txtID" id="txtID">
+            Guardar Cambios
+        </button>
+    </form>

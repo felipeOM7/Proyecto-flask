@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Resumen de Compra</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">Resumen de Compra</h1>
+        <div class="card">
+            <div class="card-header">Detalles de la Compra</div>
+            <div class="card-body">
+                <p><strong>Total:</strong> ${{ total }}</p>
+
+                <form action="/carrito/completar_compra" method="POST">
+                    <input type="hidden" name="carrito_id" value="{{ carrito_id }}">
+                    <input type="hidden" name="total" value="{{ total }}">
+
+                    <div class="mb-3">
+                        <label for="metodo_pago" class="form-label">Método de Pago</label>
+                        <select class="form-control" name="metodo_pago" id="metodo_pago">
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="PayPal">PayPal</option>
+                            <option value="Efectivo">Efectivo</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="direccion_envio" class="form-label">Dirección de Envío</label>
+                        <textarea class="form-control" name="direccion_envio" id="direccion_envio" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Completar Compra</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

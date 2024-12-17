@@ -1,0 +1,21 @@
+{% include 'admin/menu.html' %}
+
+<form action="/admin/categoria/actualizar" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="txtID" value="{{ categoria['id'] }}">
+
+    <div class="mb-3">
+        <label for="txtNombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" name="txtNombre" value="{{ categoria['nombre'] }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtDescripcion" class="form-label">Descripción</label>
+        <input type="text" class="form-control" name="txtDescripcion" value="{{ categoria['descripcion'] }}">
+    </div>
+
+    <form action="/admin/categoria/actualizar" method="POST" style="display: inline;">
+        <button value="{{ categoria['id'] }}" type="submit" class="btn btn-danger" name="txtID" id="txtID">
+            Guardar Cambios
+        </button>
+    </form>
+</form>

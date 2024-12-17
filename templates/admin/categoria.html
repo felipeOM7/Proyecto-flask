@@ -1,0 +1,50 @@
+
+
+{% include 'admin/menu.html' %}
+
+<div class="container"  aria-label="">
+
+    <div class="row">
+        <div class="col-md-5">
+
+            <div class="card">
+                <div class="card-header">Datos del producto</div>
+                <div class="card-body">
+
+                    <form action="/admin/categoria/guardar" method="post" enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label for="txtNombre" class="form-label">Nombre de la categoria</label>
+                            <input type="text" class="form-control" name="txtNombre" id="txtNombre"
+                                aria-describedby="helpId" placeholder="Escriba el nombre de la categoria" />
+
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label for="txtDescripcion" class="form-label">Descripción:</label>
+                            <input type="text" class="form-control" name="txtDescripcion" id="txtDescripcion"
+                                aria-describedby="helpId" placeholder="Introduzca la descripción de la categoria" />
+
+                        </div>
+
+
+                        <form action="/admin/categoria/guardar" method="POST">
+                            <button type="submit" class="btn btn-primary">
+                               Guardar categoria
+                            </button>
+                        </form>
+                        
+
+
+                    </form>
+
+
+                </div>
+                <div class="card-footer text-muted"></div>
+            </div>
+
+        </div>
+    
+</div>

@@ -28,7 +28,12 @@ if conexion.is_connected():
 @app.route('/')
 def inicio():
     print("Conexion exitosa MySQL")
-    return render_template('sitio/inicio.html')
+    return render_template('index.html')
+
+@app.route('/products')
+def productos_index():
+    
+    return render_template('product.html')
 
 @app.route('/catalogo')
 def catalogo():
@@ -128,6 +133,96 @@ def imagenes(imagen):
     return send_from_directory(img_directory, imagen)
 
 
+@app.route('/admin/Pedidos')
+def pedidos_admin():
+    pedido = []
+    
+    try:
+        
+        
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM `pedidos`')
+        pedido = cursor.fetchall()
+        print(pedido)
+        conexion.commit()
+        
+        
+        
+    except mysql.connector.Error as err:
+        print(f'Error de conexion: {err}')    
+    
+
+    return render_template('/admin/Pedidos.html', pedidos = pedido)    
+
+@app.route('/admin/Pedidos/finalizado', methods=['POST'])
+def pedidos_finalizado():
+    
+    pedido_id = request.form.get('id')
+    
+    
+    if not pedido_id:
+        
+        return 'Error, falta ID del pedido', 400
+    
+    try: 
+        
+        
+        
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM pedidos WHERE id = %s', (pedido_id,))
+        pedido = cursor.fetchone()
+        
+        
+        if not pedido:
+            
+            return 'Pedido con ID: {pedido_id}, no encontrado', 404
+        
+        
+        
+        cursor.execute('UPDATE pedidos SET estado = %s WHERE id = %s', ('entregado', pedido_id))
+        
+        conexion.commit()
+    
+    except mysql.connector.Error as err:
+        print(f'Error: {err}')
+    
+    finally:
+        cursor.close()
+        
+    return redirect('/admin/Pedidos')
+    
+@app.route('/admin/Pedidos/cancelar', methods = ['POST'])
+def pedido_cancelado():
+    
+    pedido_id = request.form.get('id')
+    
+    if not pedido_id:
+        
+        return 'Falta ID del pedido'
+    
+    try:
+        
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM pedidos WHERE id = %s', (pedido_id,))
+        pedido = cursor.fetchone()
+        
+        if not pedido: 
+            
+            return 'El pedido no existe', 404
+        
+        cursor.execute('UPDATE pedidos SET estado = %s WHERE id = %s', ('cancelado', pedido_id))
+        conexion.commit()
+        
+        
+    except mysql.connector.Error as err:
+        
+        print('Error en el sistema : {err}') 
+        
+    finally:
+        cursor.close()   
+    
+    return redirect('/admin/Pedidos')
+    
 
 
 @app.route('/admin/Productos')
@@ -446,6 +541,75 @@ def logout_cliente():
     
     return redirect('/sitio/login')
 
+
+@app.route('/cliente/Pedidos')
+def pedidos_clientes():
+    
+    pedidos = []
+    
+    try:
+        
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute("""
+        SELECT 
+            pedidos.id AS pedido_id, 
+            pedidos.total, 
+            pedidos.metodo_pago, 
+            pedidos.estado, 
+            pedidos.direccion_envio, 
+            pedidos.fecha_pedido, 
+            usuarios.nombre AS usuario_nombre
+        FROM pedidos
+        JOIN usuarios ON pedidos.usuario_id = usuarios.id
+""")
+        pedidos = cursor.fetchall()
+        
+        
+        
+        
+    except mysql.connector.Error as err:
+        print('Error al conectar BD: {err}') 
+    
+    finally:
+        
+        cursor.close()   
+        
+    
+    return render_template('/cliente/Pedidos.html', pedidos = pedidos)   
+    
+@app.route('/cliente/Pedidos/cancelado', methods = ['POST'])
+def pedido_cancelar():
+    pedido_id = request.form.get('id')
+    
+    
+    if not pedido_id: 
+        
+        return 'Error, falta ID del pedido', 400
+    
+    try:
+        
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM pedidos WHERE id = %s', (pedido_id,))
+        pedido = cursor.fetchone()
+        
+        if not pedido: 
+            
+            return 'Pedido con ID: {pedido_id} no fue encontrado', 404
+        
+        cursor.execute('UPDATE pedidos SET estado = %s WHERE id = %s', ('cancelado', pedido_id))
+        conexion.commit()
+        
+    except mysql.connector.Error as err:
+        
+        print('Error al conectar BD: {err}')   
+        
+    finally:
+        cursor.close()
+        
+    return redirect('/cliente/Pedidos') 
+    
+   
+
 @app.route('/carrito/agregar', methods=['POST'])
 def agregar_carrito():
     
@@ -603,7 +767,7 @@ def delete_carrito():
     return redirect('/carrito/show')
     
     
-@app.route('/carrito/finalizar_compra', methods=['POST'])
+@app.route('/carrito/finalizar_compra', methods=['GET','POST'])
 def finalizar_compra():
     
     try:
@@ -640,59 +804,64 @@ def finalizar_compra():
         flash('Error al procesar la compra', err)
           
 
-@app.route('/carrito/pagar', methods=['POST'])
+@app.route('/carrito/pagar', methods=['POST', 'GET'])
 def pagar():
-    # Obtener los datos del formulario
-    carrito_id = request.form.get('carrito_id')
-    total = float(request.form.get('total', 0))
-    metodo_pago = request.form.get('metodo_pago')
-    direccion_envio = request.form.get('direccion_envio')
     
-    if not carrito_id or not total or not metodo_pago or not direccion_envio:
-        flash('Todos los campos son obligatorios.', 'warning')
-        return redirect('/carrito/finalizar')
+    if request.method == 'POST':
+        carrito_id = request.form.get('carrito_id')
+        total = float(request.form.get('total', 0))
+        metodo_pago = request.form.get('metodo_pago')
+        direccion_envio = request.form.get('direccion_envio')
 
-    try:
-        cursor = conexion.cursor()
-        estado = 'pendiente'
+      
+        if not carrito_id or not metodo_pago or not direccion_envio:
+            flash('Todos los campos son obligatorios. Por favor, complete la información.', 'warning')
+            return redirect('/carrito/finalizar_compra')  
 
-       
-        cursor.execute('''
-            INSERT INTO pedidos(usuario_id, total, metodo_pago, estado, direccion_envio, fecha_pedido)
-            VALUES (%s, %s, %s, %s, %s, NOW())
-        ''', (session['id'], total, metodo_pago, estado, direccion_envio))
+        try:
+            cursor = conexion.cursor()
+            estado = 'pendiente'
 
-        pedido_id = cursor.lastrowid
+            cursor.execute(''' 
+                INSERT INTO pedidos(usuario_id, total, metodo_pago, estado, direccion_envio, fecha_pedido) 
+                VALUES (%s, %s, %s, %s, %s, NOW())
+            ''', (session['id'], total, metodo_pago, estado, direccion_envio))
 
-        
-        cursor.execute('''
-            INSERT INTO pedido_detalles (pedido_id, producto_id, cantidad, precio_unitario)
-            SELECT %s, producto_id, cantidad, p.precio FROM carrito_productos cp JOIN productos p ON cp.producto_id = p.id WHERE cp.carrito_id = %s
-        ''', (pedido_id, carrito_id))
+            pedido_id = cursor.lastrowid
 
+            cursor.execute(''' 
+                INSERT INTO pedido_detalles (pedido_id, producto_id, cantidad, precio_unitario) 
+                SELECT %s, producto_id, cantidad, p.precio 
+                FROM carrito_productos cp 
+                JOIN productos p ON cp.producto_id = p.id 
+                WHERE cp.carrito_id = %s
+            ''', (pedido_id, carrito_id))
+            
+            print(f"Actualizando stock para carrito_id: {carrito_id}")
+            cursor.execute(''' 
+                UPDATE productos p 
+                JOIN carrito_productos cp ON p.id = cp.producto_id 
+                SET p.stock = p.stock - cp.cantidad 
+                WHERE cp.carrito_id = %s
+            ''', (carrito_id,))
+            cursor.execute('DELETE FROM carrito_productos WHERE carrito_id = %s', (carrito_id,))
 
-        
-        cursor.execute('''
-            UPDATE productos p
-            JOIN carrito_productos cp ON p.id = cp.producto_id
-            SET p.stock = p.stock - cp.cantidad
-            WHERE cp.carrito_id = %s
-        ''', (carrito_id,))
+            conexion.commit()
 
+            flash('Compra completada exitosamente.', 'success')
+            return redirect('/cliente/inicio_cliente')
 
-        cursor.execute('UPDATE carritos SET estado = "finalizado" WHERE id = %s', (carrito_id,))
+        except mysql.connector.Error as err:
+            print(f'Error al completar la compra: {err}')
+            conexion.rollback()
+            return redirect('/carrito/finalizar_compra') 
 
-        conexion.commit()
+        finally:
+            cursor.close()
 
-        flash('Compra completada exitosamente.', 'success')
-        return redirect('/cliente/inicio_cliente')
+   
+    return redirect('/cliente/inicio_cliente')
 
-    except mysql.connector.Error as err:
-        flash(f'Error al completar la compra: {err}', 'danger')
-        conexion.rollback()
-
-    finally:
-        cursor.close()
 
 
 @app.route('/api/catalogo', methods=['GET'])

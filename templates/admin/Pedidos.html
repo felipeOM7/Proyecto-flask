@@ -1,0 +1,69 @@
+{% include 'admin/menu.html' %}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+
+            
+
+        </div>
+        <div class="col-md-15">
+
+            <div class="table-responsive">
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Metodo de pago</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Direccion</th>
+                            <th scope="col">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for ped in pedidos %}
+                        <tr>
+                            <td>{{ ped['id'] }}</td>
+                            <td>{{ ped['usuario_id'] }}</td>
+                            <td>{{ ped['total'] }}</td>
+                            <td>{{ ped['metodo_pago'] }}</td>
+                            <td>{{ ped['estado'] }}</td>
+                            <td>{{ ped['direccion_envio'] }}</td>
+                            <td>{{ped['fecha_pedido']}}</td>
+
+
+                            <td>
+                                <form action="/admin/Pedidos/finalizado" method="POST" style="display: inline;">
+                                    <input type="hidden" name="id" value="{{ ped['id'] }}">
+                                    <button type="submit" class="btn btn-success">
+                                        Completado
+                                    </button>
+                                </form>
+
+
+                            </td>
+
+                            <td>
+                                <form action="/admin/Pedidos/cancelar" method="POST" style="display: inline;">
+                                    <input type="hidden" name="id" value="{{ ped['id'] }}">
+                                    <button type="submit" class="btn btn-danger">
+                                        Cancelar
+                                    </button>
+                                </form>
+
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+        </div>

@@ -1,15 +1,64 @@
 import flet as ft
 import requests
 import re
+import os
+from functools import partial
+
+
+class products_card(ft.Container):
+
+    def __init__(self, page, img_src, title, sub_title, price, rating):
+
+        super().__init__(
+            alignment=ft.alignment.center,
+            width=150,
+            height=150,
+            border_radius=10,
+            bgcolor="#141821",
+            margin=ft.margin.only(top=10)
+
+        )
+
+        self.page = page
+        self.img_src = img_src
+        self.title = title
+        self.sub_title = sub_title
+        self.price = price
+        self.rating = rating
+        self.color_coffee = "#b9894b"
+        self.bg_color = "#0c0f14"
+        self.container_color = "#141821"
+
+        self.content ft.Column(expand=True,
+                               spacing=0,
+                               controls=[
+
+                                   ft.Stack(controls=[
+
+                                       ft.Container(border_radius=10,
+                                                    on_click=self.show_container)
+
+                                   ])
+
+                               ])
 
 
 def main(page: ft.Page):
     page.title = "BRAFEL"
-    page.window.width = 500
+    page.window.width = 450
     page.window.height = 700
     page.window.resizable = False
     page.window.center()
     page.icon = "https://cdn-icons-png.flaticon.com/512/2910/2910765.png"
+
+    page.fonts = {
+        "Mifuente": "APP_BRAFEL\Montserrat.ttf"
+    }
+
+    """if os.path.exists(fuente):
+        print(f"La fuente {fuente} fue encontrada.")
+    else:
+        print(f"La fuente {fuente} NO fue encontrada.")"""
 
     def show_snackbar(message, color="green"):
         page.snack_bar = ft.SnackBar(
@@ -133,113 +182,328 @@ def main(page: ft.Page):
 
     def login_page(page: ft.Page):
 
-        page.window.width = 1300
-        page.window.height = 700
         page.window.resizable = False
         page.window.center()
-        menu_visible = False
+        page.spacing = 5
+        page.padding = 5
 
-        def view_menu(e):
-            nonlocal menu_visible
-            menu_visible = not menu_visible
-            menu_container.visible = menu_visible
+        products = []
+
+        grid_view = ft.GridView(
+            runs_count=2,
+            child_aspect_ratio=0.6,
+            controls=products
+        )
+
+        container_1 = ft.Container(expand=True,
+                                   padding=10, offset=ft.transform.Offset(0, 0),
+                                   content=ft.Column(
+                                       expand=True,
+                                       controls=[
+
+                                           ft.Row(
+                                               alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                               controls=[
+                                                   ft.IconButton(
+                                                       ft.icons.MENU, icon_color="white"),
+                                                   ft.Container(
+                                                       ft.Image(src="", height=30,), border_radius=10)
+
+                                               ]),
+
+                                           ft.Text(
+                                               "Encuentra el mejor \n estilo para tu hogar", font_family="Mifuente", size=25, weight="bold", color="white"),
+                                           ft.TextField(prefix=ft.Icon(name=ft.icons.SEARCH, color="white"), hint_text=" Encuentra tu mueble", border_radius=10,
+                                                        bgcolor="#141821", border_color="transparent", on_change=filter_products, color="white",
+                                                        hint_style=ft.TextStyle(color="white"), ),
+
+                                           ft.Container(expand=True,
+                                                        content=ft.Tabs(
+
+                                                            selected_index=0,
+                                                            expand=True,
+                                                            indicator_color="transparent",
+                                                            label_color="#b9894b",
+                                                            unselected_label_color="white",
+                                                            tabs=[
+                                                                ft.Tab(
+                                                                    text="Todos",
+                                                                    content=grid_view
+                                                                ),
+                                                                ft.Tab(
+                                                                    text="Salas",
+                                                                    content=ft.GridView(
+                                                                        runs_count=2,
+                                                                        child_aspect_ratio=0.6,
+                                                                        controls=[
+
+                                                                        ]
+
+
+                                                                    )
+
+                                                                ),
+
+                                                                ft.Tab(
+
+                                                                    text="Comedores",
+                                                                    content=ft.GridView(
+                                                                        runs_count=2,
+                                                                        child_aspect_ratio=0.6,
+                                                                        controls=[
+
+                                                                        ]
+                                                                    )
+
+
+
+                                                                ),
+
+                                                                ft.Tab(
+                                                                    text="Recamaras",
+                                                                    content=ft.GridView(
+                                                                        runs_count=2,
+                                                                        child_aspect_ratio=0.6,
+                                                                        controls=[
+
+
+
+                                                                        ]
+                                                                    )
+
+                                                                ),
+
+                                                                ft.Tab(
+                                                                    text="Sanitarios",
+                                                                    content=ft.GridView(
+                                                                        runs_count=2,
+                                                                        child_aspect_ratio=0.6,
+                                                                        controls=[]
+
+
+                                                                    )
+
+                                                                )
+
+
+                                                            ]
+
+                                                        )
+
+                                                        )
+
+
+
+                                       ]
+
+                                   ))
+
+        container2 = ft.Container(
+
+            offset=ft.transform.Offset(-2, 0),
+            content=ft.Column(
+
+                expand=True,
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                controls=[
+                    ft.Text("Tienda", size=20, color="white"),
+                    ft.Container(
+                        alignment=ft.alignment.center,
+                        content=ft.Image(
+                            src="C:\\Users\\Felipe\\Downloads\\APP_FLASK\\APP_BRAFEL\\assets\\images\\shop.gif", fit=ft.ImageFit.CONTAIN, width=100)
+
+
+                    )
+
+
+                ]
+
+
+            )
+
+
+        )
+
+        container3 = ft.Container(
+
+            offset=ft.transform.Offset(-2, 0),
+            content=ft.Column(
+
+                expand=True,
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                controls=[
+                    ft.Text("Notificaciones", size=20, color="white"),
+                    ft.Container(
+                        alignment=ft.alignment.center,
+                        content=ft.Image(
+                            src="C:\\Users\\Felipe\\Downloads\\APP_FLASK\\APP_BRAFEL\\assets\\images\\notification.gif", fit=ft.ImageFit.CONTAIN, width=120)
+
+
+                    )
+
+
+                ]
+
+
+            )
+
+
+        )
+
+        container4 = ft.Container(
+
+            offset=ft.transform.Offset(-2, 0),
+            content=ft.Column(
+
+                expand=True,
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                controls=[
+                    ft.Text("Favoritos", size=20, color="white"),
+                    ft.Container(
+                        alignment=ft.alignment.center,
+                        content=ft.Image(
+                            src="C:\\Users\\Felipe\\Downloads\\APP_FLASK\\APP_BRAFEL\\assets\\images\\favorite.gif", fit=ft.ImageFit.CONTAIN, width=120)
+
+
+                    )
+
+
+                ]
+
+
+            )
+
+
+        )
+
+        selected = ft.Container(
+
+            shape=ft.BoxShape.CIRCLE,
+            offset=ft.transform.Offset(-0.38, 0),
+            bgcolor="#18191b",
+            alignment=ft.alignment.center,
+            margin=ft.margin.only(top=5),
+            height=50,
+            content=ft.Icon(ft.icons.HOME_FILLED, color="#b9894b")
+
+
+        )
+
+        def change_position(e):
+
+            if e.control.data == "1":
+                selected.offset = ft.transform.Offset(-0.38, 0)
+                selected.content = ft.Icon(
+                    name=ft.icons.HOME_FILLED, color="#b9894b")
+                container_1.offset = ft.transform.Offset(0, 0)
+                container2.offset = ft.transform.Offset(-2, 0)
+                container3.offset = ft.transform.Offset(-2, 0)
+                container4.offset = ft.transform.Offset(-2, 0)
+
+            if e.control.data == "2":
+                selected.offset = ft.transform.Offset(-0.12, 0)
+                selected.content = ft.Icon(
+                    name=ft.icons.SHOPPING_BAG_ROUNDED, color="#b9894b")
+                container_1.offset = ft.transform.Offset(-2, 0)
+                container2.offset = ft.transform.Offset(0, 0)
+                container3.offset = ft.transform.Offset(-2, 0)
+                container4.offset = ft.transform.Offset(-2, 0)
+
+            if e.control.data == "3":
+                selected.offset = ft.transform.Offset(0.12, 0)
+                selected.content = ft.Icon(
+                    name=ft.icons.FAVORITE, color="#b9894b")
+                container_1.offset = ft.transform.Offset(-2, 0)
+                container2.offset = ft.transform.Offset(-2, 0)
+                container3.offset = ft.transform.Offset(0, 0)
+                container4.offset = ft.transform.Offset(-2, 0)
+
+            if e.control.data == "4":
+                selected.offset = ft.transform.Offset(0.38, 0)
+                selected.content = ft.Icon(
+                    name=ft.icons.NOTIFICATIONS, color="#b9894b")
+                container_1.offset = ft.transform.Offset(-2, 0)
+                container2.offset = ft.transform.Offset(-2, 0)
+                container3.offset = ft.transform.Offset(-2, 0)
+                container4.offset = ft.transform.Offset(0, 0)
+
             page.update()
 
-        title = ft.Text("Bienvenido a BRAFEL", size=24,
-                        weight="bold", color="green")
+        nav = ft.Container(
 
-        def navigation(page_name):
-
-            page.controls.clear()
-
-            if page_name == "Productos":
-                view_products(page)
-
-                page.update()
-
-        menu_options = [
-
-            {"label": "Inicio", "page": "Inicio"},
-            {"label": "Productos", "page": "Productos"},
-            {"label": "Servicios", "page": "Servicios"},
-            {"label": "Contacto", "page": "Contacto"}
-
-
-        ]
-
-        menu_items = [
-            ft.TextButton(
-                text=option["label"],
-                on_click=lambda e, page=option["page"]: navigation(page)
-            ) for option in menu_options
-        ]
-
-        menu_container = ft.Column(
-            controls=menu_items,
-            visible=False,
-            spacing=10
-
-        )
-
-        hamburguer_icon = ft.IconButton(
-
-            icon=ft.icons.MENU,
-            on_click=view_menu,
+            bgcolor="#18191b",
+            alignment=ft.alignment.center,
+            border_radius=10,
+            padding=0,
+            height=50,
+            margin=ft.margin.only(top=5),
+            content=ft.Row(
+                alignment=ft.MainAxisAlignment.SPACE_AROUND,
+                controls=[
+                    ft.IconButton(ft.icons.HOME_FILLED, data="1",
+                                  icon_color="white", icon_size=24, on_click=change_position),
+                    ft.IconButton(ft.icons.SHOPPING_BAG_ROUNDED, data="2",
+                                  icon_color="white", icon_size=24, on_click=change_position),
+                    ft.IconButton(ft.icons.FAVORITE, data="3",
+                                  icon_color="white", icon_size=24, on_click=change_position),
+                    ft.IconButton(ft.icons.NOTIFICATIONS, data="4",
+                                  icon_color="white", icon_size=24, on_click=change_position)
 
 
-        )
+                ]
 
-        logout_button = ft.ElevatedButton(
-            "Cerrar Sesión",
-            icon=ft.icons.LOGOUT,
-            width=150,
-            on_click=lambda _: page.go("/"),
+
+            )
+
+
         )
 
         page.views.append(
+
             ft.View(
                 "/contenido",
-                [
-                    ft.Column(
-                        [
-                            title,
-                            ft.Divider(),
-                            hamburguer_icon,
-                            menu_container,
-                            ft.Text(
-                                "Aquí va el contenido principal de tu aplicación"),
-                            logout_button,
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        spacing=20,
+                bgcolor="#0c0f14",
+
+                controls=[
+
+                    ft.Stack(
+                        expand=True,
+                        controls=[
+
+                            container_1,
+                            container2,
+                            container3,
+                            container4
+
+                        ]
+
+                    ),
+
+                    ft.Stack(
+                        expand=True,
+                        height=60,
+                        alignment=ft.alignment.bottom_center,
+                        controls=[
+                            nav,
+                            selected
+
+                        ]
+
                     )
-                ],
+
+                ]
+
             )
+
         )
+
         page.go("/contenido")
 
-    def view_products(page: ft.Page):
-
-        page.window.width = 1300
-        page.window.height = 700
-        page.window.resizable = False
-        page.window.center()
-
-        texto = ft.Text("Pagina de productos")
-
-        page.views.append(ft.View("/productos",
-                          [ft.Column(
-                              [texto],
-                              alignment=ft.MainAxisAlignment.CENTER,
-                              horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                              spacing=20
-
-
-
-
-                          )]))
-        page.go("/productos")
+    def filter_products(e):
+        pass
 
     def login_view(page: ft.Page):
 
@@ -279,6 +543,7 @@ def main(page: ft.Page):
                     succes_value = data.get("success")
 
                     if succes_value in [True, "True", 1]:
+
                         show_snackbar(
                             "Inicio de sesion exitoso", color="green")
                         login_page(page)
@@ -288,7 +553,7 @@ def main(page: ft.Page):
 
             except Exception as ex:
 
-                show_snackbar(f'Error al conectar con el servidor; {
+                show_snackbar(f'Error al conectar con el servidor: {
                     str(ex)}', color="red")
 
         titulo = ft.Text("Iniciar Sesión", size=24,

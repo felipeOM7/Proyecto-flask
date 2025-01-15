@@ -11,8 +11,8 @@ class products_card(ft.Container):
 
         super().__init__(
             alignment=ft.alignment.center,
-            width=150,
-            height=150,
+            width=300,
+            height=250,
             border_radius=10,
             bgcolor="#141821",
             margin=ft.margin.only(top=10)
@@ -28,19 +28,56 @@ class products_card(ft.Container):
         self.color_coffee = "#b9894b"
         self.bg_color = "#0c0f14"
         self.container_color = "#141821"
+        color = "white"
 
-        self.content ft.Column(expand=True,
-                               spacing=0,
-                               controls=[
+        self.content = ft.Column(expand=True,
+                                 spacing=0,
+                                 controls=[
 
-                                   ft.Stack(controls=[
+                                     ft.Stack(controls=[
 
-                                       ft.Container(border_radius=10,
-                                                    on_click=self.show_container)
+                                         ft.Container(border_radius=10,
 
-                                   ])
+                                                      content=ft.Image(
+                                                          src="C:\\Users\\Felipe\\Downloads\\APP_FLASK\\APP_BRAFEL\\assets\\images\\{self.img_src}.png",
+                                                          width=150,
+                                                          fit=ft.ImageFit.COVER,
+                                                          height=100),
 
-                               ])
+
+                                                      ),
+
+                                         ft.Container(
+
+                                             width=60,
+                                             alignment=ft.alignment.center,
+                                             border_radius=ft.border_radius.only(
+                                                 top_left=10, bottom_right=10),
+                                             bgcolor=ft.colors.with_opacity(
+                                                 0.6, "black"),
+                                             content=ft.Row(
+                                                 spacing=5,
+                                                 controls=[ft.Icon(ft.icons.STAR, color=self.color_coffee),
+                                                           ft.Text(f"{self.rating}",
+                                                                   weight="bold")
+
+
+                                                           ])
+
+                                         )
+
+
+                                     ]),
+
+                                     ft.Text(value=self.title, weight="bold"),
+                                     ft.Text(value=self.sub_title,
+                                             color="#5a5a5a"),
+                                     ft.Row(
+
+                                     )
+
+
+                                 ])
 
 
 def main(page: ft.Page):
@@ -187,7 +224,11 @@ def main(page: ft.Page):
         page.spacing = 5
         page.padding = 5
 
-        products = []
+        products = [
+
+            products_card(page, "cajonera", "Cajonera",
+                          "Nogal clasico", 4300, 4.9)
+        ]
 
         grid_view = ft.GridView(
             runs_count=2,

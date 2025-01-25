@@ -6,7 +6,7 @@ class products_card(ft.Container):
             alignment=ft.alignment.center,
             width=150,
             height=150,
-            border_radius=10,
+             border_radius=10,
             bgcolor="#141821",
             margin=ft.margin.only(top=10)
 

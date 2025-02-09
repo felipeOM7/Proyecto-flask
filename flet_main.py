@@ -5,36 +5,55 @@ import os
 from functools import partial
 
 
-def create_product(title, subtitle, price, rating, color):
+class ProductCard(ft.Container):
+    def __init__(self, img_src, title, sub_title, price, rating):
+        super().__init__(
 
-    stars = "".join(["⭐" for _ in range(int(rating))])
-    empty_stars = "".join(["☆" for _ in range(5 - int(rating))])
+            expand=True,
+            border_radius=10,
+            padding=10,
+            margin=ft.margin.symmetric(vertical=5),
+            bgcolor="red",
+            content=ft.Row(
+                controls=[
 
-    return ft.Container(
-
-        content=ft.Column(
-            [ft.Text(title, size=16, weight=ft.FontWeight.BOLD),
-             ft.Text(subtitle, size=16),
-             ft.Text(f"${price}", size=16),
-             ft.Text(f"{stars}{empty_stars}", size=14, color="orange"),
-             ft.ElevatedButton("Agregar al carrito", color=ft.colors.WHITE)
-
-             ]),
-
-        bgcolor=color,
-        border_radius=10,
-        padding=20,
-        alignment=ft.alignment.center
-
-
-    )
+                    ft.Container(
+                        width=100,
+                        height=100,
+                        border_radius=10,
+                        content=ft.Image(
+                            src=f"C:\\Users\\Felipe\\Downloads\\APP_FLASK\\APP_BRAFEL\\assets\\images\\{
+                                img_src}.png",
+                            fit=ft.ImageFit.CONTAIN,
+                        ),
+                    ),
+                   
+                    ft.Column(
+                        expand=True,
+                        spacing=5,
+                        controls=[
+                            ft.Text(title, weight="bold", color="white"),
+                            ft.Text(sub_title, color="#5a5a5a"),
+                            ft.Row(
+                                controls=[
+                                    ft.Icon(ft.icons.STAR, color="#b9894b"),
+                                    ft.Text(f"{rating}", color="white"),
+                                    ft.Text(f"${price}",
+                                            color="green", weight="bold"),
+                                ]
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        )
 
 
 def main(page: ft.Page):
     page.title = "BRAFEL"
     page.window.width = 450
-    page.window.height = 700
-    page.window.resizable = True
+    page.window.height = 750
+    page.window.resizable = False
     page.window.center()
     page.icon = "https://cdn-icons-png.flaticon.com/512/2910/2910765.png"
 
@@ -169,131 +188,128 @@ def main(page: ft.Page):
 
     def login_page(page: ft.Page):
 
-        page.window.resizable = False
         page.window.center()
-        page.spacing = 5
-        page.padding = 5
 
         products = [
-
-            create_product("Cajonera", "Nogal", 4500, 4.9, ft.colors.RED),
-            create_product("Cajonera", "Nogal", 4500, 4.9, ft.colors.RED),
-            create_product("Cajonera", "Nogal", 4500, 4.9, ft.colors.RED)
-
-
+            {"img_src": "cajonera", "title": "Cajonera",
+                "sub_title": "Nogal clásico", "price": 4300, "rating": 4.9},
+            {"img_src": "sofa", "title": "Sofá",
+                "sub_title": "Confort y diseño", "price": 5500, "rating": 4.7},
+            {"img_src": "mesa", "title": "Mesa",
+                "sub_title": "Para comedor", "price": 3200, "rating": 4.5},
         ]
 
-        galeria = ft.ResponsiveRow(
+        product_cards = [
+            ProductCard(
+                img_src=product["img_src"],
+                title=product["title"],
+                sub_title=product["sub_title"],
+                price=product["price"],
+                rating=product["rating"],
+            )
+            for product in products
+        ]
 
-            [ft.Container(producto, col={"sm": 12, "md": 6, "lg": 3})
-             for producto in products],
-            run_spacing=20,
-            spacing=20,
-
+        product_list = ft.ListView(
+            expand=True,
+            controls=product_cards,
         )
 
-        container_1 = ft.Container(expand=True,
-                                   padding=10, offset=ft.transform.Offset(0, 0),
-                                   content=ft.Column(
-                                       expand=True,
-                                       controls=[
+        container_1 = ft.Container(
+            expand=True,
+            padding=10,
+            offset=ft.transform.Offset(0, 0),
+            content=ft.Column(
+                expand=True,
+                controls=[
 
-                                           ft.Row(
-                                               alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                                               controls=[
-                                                   ft.IconButton(
-                                                       ft.icons.MENU, icon_color="white"),
-                                                   ft.Container(
-                                                       ft.Image(src="", height=30,), border_radius=10)
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        controls=[
+                            ft.IconButton(ft.icons.MENU, icon_color="white"),
+                            ft.Container(
+                                ft.Image(src="", height=30), border_radius=10
+                            ),
+                        ],
+                    ),
 
-                                               ]),
+                    ft.Text(
+                        "Encuentra el mejor \n estilo para tu hogar",
+                        font_family="Mifuente",
+                        size=25,
+                        weight="bold",
+                        color="white",
+                    ),
 
-                                           ft.Text(
-                                               "Encuentra el mejor \n estilo para tu hogar", font_family="Mifuente", size=25, weight="bold", color="white"),
-                                           ft.TextField(prefix=ft.Icon(name=ft.icons.SEARCH, color="white"), hint_text=" Encuentra tu mueble", border_radius=10,
-                                                        bgcolor="#141821", border_color="transparent", on_change=filter_products, color="white",
-                                                        hint_style=ft.TextStyle(color="white"), ),
+                    ft.TextField(
+                        prefix=ft.Icon(name=ft.icons.SEARCH, color="white"),
+                        hint_text=" Encuentra tu mueble",
+                        border_radius=10,
+                        bgcolor="#141821",
+                        border_color="transparent",
+                        on_change=filter_products,
+                        color="white",
+                        hint_style=ft.TextStyle(color="white"),
+                    ),
 
-                                           ft.Container(expand=True,
-                                                        content=ft.Tabs(
+                    ft.Container(
+                        expand=True,
+                        
+                        
+                        content=ft.Tabs(
+                            expand=True,  
+                            selected_index=0,
+                            indicator_color="transparent",
+                            label_color="#b9894b",
+                            unselected_label_color="white",
+                            tabs=[
 
-                                                            expand=True,
-                                                            selected_index=0,
-                                                            indicator_color="transparent",
-                                                            label_color="#b9894b",
-                                                            unselected_label_color="white",
-                                                            tabs=[
-                                                                ft.Tab(
-                                                                    text="Todos",
-                                                                    content=galeria
-                                                                ),
-                                                                ft.Tab(
-                                                                    text="Salas",
-                                                                    content=ft.GridView(
-                                                                        runs_count=2,
-                                                                        child_aspect_ratio=0.6,
-                                                                        controls=[
+                                ft.Tab(
+                                    text="Todos",
+                                    content=ft.Container(
+                                        expand=True,
+                                        content=product_list,
+                                    ),
+                                ),
 
-                                                                        ]
-
-
-                                                                    )
-
-                                                                ),
-
-                                                                ft.Tab(
-
-                                                                    text="Comedores",
-                                                                    content=ft.GridView(
-                                                                        runs_count=2,
-                                                                        child_aspect_ratio=0.6,
-                                                                        controls=[
-
-                                                                        ]
-                                                                    )
-
-
-
-                                                                ),
-
-                                                                ft.Tab(
-                                                                    text="Recamaras",
-                                                                    content=ft.GridView(
-                                                                        runs_count=2,
-                                                                        child_aspect_ratio=0.6,
-                                                                        controls=[
-
-
-
-                                                                        ]
-                                                                    )
-
-                                                                ),
-
-                                                                ft.Tab(
-                                                                    text="Sanitarios",
-                                                                    content=ft.GridView(
-                                                                        runs_count=2,
-                                                                        child_aspect_ratio=0.6,
-                                                                        controls=[]
-
-
-                                                                    )
-
-                                                                )
-
-
-                                                            ]
-
-                                                        )
-
-                                                        )
-
-
-
-                                       ]
-
-                                   ))
+                                ft.Tab(
+                                    text="Salas",
+                                    content=ft.GridView(
+                                        runs_count=2,
+                                        child_aspect_ratio=0.6,
+                                        controls=[],
+                                    ),
+                                ),
+                                ft.Tab(
+                                    text="Comedores",
+                                    content=ft.GridView(
+                                        runs_count=2,
+                                        child_aspect_ratio=0.6,
+                                        controls=[],
+                                    ),
+                                ),
+                                ft.Tab(
+                                    text="Recamaras",
+                                    content=ft.GridView(
+                                        runs_count=2,
+                                        child_aspect_ratio=0.6,
+                                        controls=[],
+                                    ),
+                                ),
+                                ft.Tab(
+                                    text="Sanitarios",
+                                    content=ft.GridView(
+                                        runs_count=2,
+                                        child_aspect_ratio=0.6,
+                                        controls=[],
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ),
+                ],
+            ),
+        )
 
         container2 = ft.Container(
 
